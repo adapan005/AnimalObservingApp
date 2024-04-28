@@ -1,7 +1,6 @@
 package com.example.animalobserving.ui.theme.networkCommunication
 
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import java.util.Date
 
 enum class MessageType {
     Informative,
@@ -10,7 +9,7 @@ enum class MessageType {
     MapMarkerInfo
 }
 
-class Message(val text: String, val date: Long, val senderName: String, val messageType: MessageType = MessageType.Informative) {
+data class Message(val text: String, val date: Date, val senderName: String, val messageType: MessageType = MessageType.Informative) {
 
     fun toJsonString(): String {
         throw NotImplementedError()
