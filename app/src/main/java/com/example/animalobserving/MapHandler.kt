@@ -1,6 +1,7 @@
 package com.example.animalobserving
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -33,6 +34,7 @@ class MapMarker(private val markerId: Int, private val latitude: Double, private
 
 class MapViewModel : ViewModel() {
     private val markersList: MutableList<MapMarker> = mutableListOf()
+
     var mapView: MapView? = null
 
     fun drawMarkersOnMap() {
@@ -60,7 +62,6 @@ class MapViewModel : ViewModel() {
     }
 }
 
-@SuppressLint("UnrememberedMutableState")
 @Composable
 fun OsmMapView(mapViewModel: MapViewModel, centreLat: BigDecimal = BigDecimal("48.6690"), centreLng: BigDecimal = BigDecimal("19.6990")) {
     val geoPoint by remember { mutableStateOf(GeoPoint(centreLat.toDouble(), centreLng.toDouble())) }

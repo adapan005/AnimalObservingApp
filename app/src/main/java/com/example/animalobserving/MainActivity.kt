@@ -1,7 +1,9 @@
 package com.example.animalobserving
 
+import android.content.ContentValues.TAG
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
@@ -39,7 +41,15 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val client = NetworkClient("192.168.0.191", 55557)
+        //Request markers from server
+        val client = NetworkClient("10.0.2.2", 55557)
+        Thread {
+            client.start { message ->
+                // Add markers to list or smth, idk
+            }
+            client.requestMarkers(38.0, 14.0, 50.0, 20.0)
+            client.stop()
+        }.start()
 
         Configuration.getInstance().load(applicationContext, PreferenceManager.getDefaultSharedPreferences(applicationContext))
         setContent {
@@ -52,60 +62,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun HomeScreen(mapViewModel: MapViewModel ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = "Animal Observing Client") }
-            )
-        },
-        content = { padding ->
-            Column(modifier = Modifier.padding(padding)) {
-                OsmMapView(mapViewModel)
-            }
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { }) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
-            }
-        },
-        bottomBar = {
-            NavigationBar {
-                val selectedItem = null
-                NavigationBarItem(
-                    icon = { Icon(Icons.Filled.List, contentDescription = "A") },
-                    label = { Text("List") },
-                    selected = selectedItem == "A",
-                    onClick = { }
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Build, contentDescription = "A") },
-                    label = { Text("Filter") },
-                    selected = selectedItem == "B",
-                    onClick =
-                    {
-                        mapViewModel.addMarker(48.6690, 19.6990, 1)
-                    }
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Filled.Settings, contentDescription = "A") },
-                    label = { Text("Settings") },
-                    selected = selectedItem == "C",
-                    onClick = { }
-                )
-            }
-        }
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AnimalObservingTheme {
     }
 }
