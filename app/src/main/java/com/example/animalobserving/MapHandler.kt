@@ -63,12 +63,17 @@ class MapViewModel : ViewModel() {
 }
 
 @Composable
-fun OsmMapView(mapViewModel: MapViewModel, centreLat: BigDecimal = BigDecimal("48.6690"), centreLng: BigDecimal = BigDecimal("19.6990")) {
+fun OsmMapView(
+    mapViewModel: MapViewModel,
+    modifier: Modifier = Modifier,
+    centreLat: BigDecimal = BigDecimal("48.6690"),
+    centreLng: BigDecimal = BigDecimal("19.6990"),
+) {
     val geoPoint by remember { mutableStateOf(GeoPoint(centreLat.toDouble(), centreLng.toDouble())) }
 
     mapViewModel.mapView = MapView(LocalContext.current)
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = modifier.fillMaxSize()) {
         AndroidView(
             modifier = Modifier.weight(1f),
             factory = { _ ->

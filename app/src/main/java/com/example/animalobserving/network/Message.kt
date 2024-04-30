@@ -1,15 +1,15 @@
-package com.example.animalobserving.ui.theme.networkCommunication
+package com.example.animalobserving.network
 
 import java.util.Date
 
-enum class MessageType {
+enum class MsgType {
     Informative,
     RequestMarkers,
     RequestDetailedMarker,
     MapMarkerInfo
 }
 
-data class Message(val text: String, val date: Date, val senderName: String, val messageType: MessageType = MessageType.Informative) {
+data class Message(val Text: String, val Date: Date, val SenderName: String, val MessageType: MsgType = MsgType.Informative) {
 
     fun toJsonString(): String {
         throw NotImplementedError()

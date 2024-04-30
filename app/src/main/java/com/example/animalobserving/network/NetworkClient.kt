@@ -1,4 +1,4 @@
-package com.example.animalobserving.ui.theme.networkCommunication
+package com.example.animalobserving.network
 
 import android.content.ContentValues.TAG
 import android.util.Log
@@ -45,7 +45,8 @@ class NetworkClient(private val serverIp: String, private val serverPort: Int) {
     }
 
     fun requestMarkers(lat1: Double, lng1: Double, lat2: Double, lng2: Double) {
-        val message = Message ("$lat1;$lng1;$lat2;$lng2", Calendar.getInstance().time, "", MessageType.RequestMarkers)
+        //TODO: Oprav Message tak aby sa formát dátumu zhodoval s formátom na serveri, lebo inak crashuje pri serializacii json objectu
+        val message = Message ("$lat1;$lng1;$lat2;$lng2", Calendar.getInstance().time, "", MsgType.RequestMarkers)
         sendMessage(message)
     }
 
