@@ -5,4 +5,5 @@
     <string name="filter_screen">Filter</string>
     <string name="settings_screen">Settings</string>
     <string name="back_button">Back</string>
+    <string name="new_record_screen">Add a new record</string>
 </resources>

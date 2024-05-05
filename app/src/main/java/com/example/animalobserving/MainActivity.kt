@@ -9,14 +9,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.example.animalobserving.ui.theme.AnimalObservingTheme
-import com.example.animalobserving.network.NetworkClient
 import com.example.animalobserving.ui.screens.AnimalObservingApp
-import com.example.animalobserving.ui.screens.HomeScreen
 import org.osmdroid.config.Configuration
 
 
 class MainActivity : ComponentActivity() {
-    val mapViewModel: MapViewModel = MapViewModel()
+    //val mapViewModel: MapViewModel = MapViewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -48,7 +46,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AnimalObservingApp(mapViewModel)
+                    AnimalObservingApp()
                     //HomeScreen(mapViewModel)
                 }
             }

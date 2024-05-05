@@ -1,8 +1,6 @@
 package com.example.animalobserving.ui.screens
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -18,29 +16,31 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.animalobserving.MapViewModel
-import com.example.animalobserving.OsmMapView
 import com.example.animalobserving.R
 
 enum class AppScreen(@StringRes val title: Int) {
     Home(title = R.string.home_screen),
     List(title = R.string.list_screen),
     Filter(title = R.string.filter_screen),
-    Settings(title = R.string.settings_screen)
+    Settings(title = R.string.settings_screen),
+    NewRecord(title = R.string.new_record_screen)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,6 +53,9 @@ fun AnimalObservingAppTopBar(
 ) {
     TopAppBar(
         title = { Text(stringResource(currentScreen.title)) },
+        colors = TopAppBarDefaults.mediumTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        ),
         modifier = modifier,
         navigationIcon = {
             if (canNavigateBack) {
@@ -70,9 +73,11 @@ fun AnimalObservingAppTopBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnimalObservingApp(
-    viewModel: MapViewModel,
+    //viewModel: MapViewModel,
     navController: NavHostController = rememberNavController()
 ) {
+    val mapViewModel: MapViewModel = viewModel(factory = MapViewModel.Factory)
+
     val backStackEntry by navController.currentBackStackEntryAsState()
     var currentScreen = AppScreen.valueOf(
         backStackEntry?.destination?.route ?: AppScreen.Home.name
@@ -88,7 +93,12 @@ fun AnimalObservingApp(
         floatingActionButton = {
             if (currentScreen == AppScreen.Home) {
                 FloatingActionButton(onClick = {
-                    //mapViewModel.addMarker(48.6690, 19.6990, 1)
+                    if (currentScreen != AppScreen.NewRecord) {
+                        navController.navigate(AppScreen.NewRecord.name)
+                        currentScreen = AppScreen.valueOf(
+                            backStackEntry?.destination?.route ?: AppScreen.NewRecord.name
+                        )
+                    }
                 }) {
                     Icon(Icons.Default.Add, contentDescription = "Add")
                 }
@@ -163,8 +173,9 @@ fun AnimalObservingApp(
                 .padding(innerPadding)
         ) {
             composable(route = AppScreen.Home.name) {
-                OsmMapView(
-                    mapViewModel = viewModel,
+                OsmMap(
+                    mapViewModel = mapViewModel,
+                    {/*TODO: IMPLEMENT RETRY ACTION*/},
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -183,12 +194,11 @@ fun AnimalObservingApp(
                     modifier = Modifier.fillMaxSize()
                 )
             }
+            composable(route = AppScreen.NewRecord.name) {
+                AddNewRecordScreen(
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun HomeScreen(mapViewModel: MapViewModel, modifier: Modifier) {
-    OsmMapView(mapViewModel, modifier.fillMaxSize())
 }
