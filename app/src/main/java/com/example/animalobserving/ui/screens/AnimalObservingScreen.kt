@@ -173,9 +173,9 @@ fun AnimalObservingApp(
                 .padding(innerPadding)
         ) {
             composable(route = AppScreen.Home.name) {
-                OsmMap(
+                HomeScreen(
                     mapViewModel = mapViewModel,
-                    {/*TODO: IMPLEMENT RETRY ACTION*/},
+                    retryAction = mapViewModel::getMapMarkers,
                     modifier = Modifier.fillMaxSize()
                 )
             }
