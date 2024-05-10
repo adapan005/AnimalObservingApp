@@ -67,13 +67,10 @@ fun OsmMap(
                     val newMarker = Marker(mapViewModel.mapView)
                     val position = GeoPoint(it.getLatitude(), it.getLongitude())
                     newMarker.position = position
+                    newMarker.title = it.getLabel()
+                    newMarker.subDescription = "Record ID: ${it.getID()}"
                     mapViewModel.mapView?.overlays?.add(newMarker)
                 }
-//                val marker = Marker(mapViewModel.mapView)
-//                marker.position = geoPoint
-//                marker.title = "Marker Title"
-//                marker.snippet = "Marker Description"
-//                mapViewModel.mapView?.overlays?.add(marker)
             }
         )
     }

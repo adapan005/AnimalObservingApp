@@ -73,7 +73,6 @@ fun AnimalObservingAppTopBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnimalObservingApp(
-    //viewModel: MapViewModel,
     navController: NavHostController = rememberNavController()
 ) {
     val mapViewModel: MapViewModel = viewModel(factory = MapViewModel.Factory)
@@ -169,7 +168,6 @@ fun AnimalObservingApp(
             startDestination = AppScreen.Home.name,
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
         ) {
             composable(route = AppScreen.Home.name) {
@@ -181,6 +179,8 @@ fun AnimalObservingApp(
             }
             composable(route = AppScreen.List.name) {
                 RecordListScreen(
+                    mapViewModel = mapViewModel,
+                    navController,
                     modifier = Modifier.fillMaxSize()
                 )
             }

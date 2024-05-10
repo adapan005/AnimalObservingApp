@@ -1,6 +1,5 @@
 package com.example.animalobserving.ui.screens
 
-import android.text.Spannable.Factory
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -16,9 +15,8 @@ import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
-import java.io.IOException
 
-class MapMarker(private val markerId: Int, private val latitude: Double, private val longitude: Double) {
+class MapMarker(private val markerId: Int, private val latitude: Double, private val longitude: Double, private val label: String) {
     fun getLatitude(): Double {
         return latitude
     }
@@ -26,10 +24,17 @@ class MapMarker(private val markerId: Int, private val latitude: Double, private
     fun getLongitude(): Double {
         return longitude
     }
+
+    fun getLabel(): String {
+        return label
+    }
+
+    fun getID(): Int {
+        return markerId
+    }
     override fun toString(): String {
         return "$markerId;$latitude;$longitude"
     }
-
 }
 
 sealed interface MapUiState {
@@ -76,8 +81,8 @@ class MapViewModel(private val mapMarkersRepository: MapMarkersRepository) : Vie
         mapView?.overlays?.clear()
     }
 
-    fun addMarker(latitude: Double, longitude: Double, id: Int) {
-        val newMarker = MapMarker(id, latitude, longitude)
+    fun addMarker(latitude: Double, longitude: Double, id: Int, title: String) {
+        val newMarker = MapMarker(id, latitude, longitude, title)
         markersList.add(newMarker)
         clearMarkers()
         drawMarkersOnMap()
