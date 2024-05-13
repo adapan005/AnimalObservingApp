@@ -3,8 +3,6 @@ package com.example.animalobserving.ui.screens
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
@@ -195,7 +193,7 @@ fun AnimalObservingApp(
                 )
             }
             composable(route = AppScreen.NewRecord.name) {
-                AddNewRecordScreen(
+                AddingNewRecordScreen(
                     modifier = Modifier.fillMaxSize()
                 )
             }

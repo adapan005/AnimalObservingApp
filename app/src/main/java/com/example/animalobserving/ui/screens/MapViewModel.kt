@@ -10,7 +10,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.animalobserving.AnimalObservingApplication
-import com.example.animalobserving.data.MapMarkersRepository
+import com.example.animalobserving.data.markers.MapMarkersRepository
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -73,31 +73,6 @@ class MapViewModel(private val mapMarkersRepository: MapMarkersRepository) : Vie
         }
     }
 
-    private val markersList: MutableList<MapMarker> = mutableListOf()
-
     var mapView: MapView? = null
 
-    private fun clearMarkers() {
-        mapView?.overlays?.clear()
-    }
-
-    fun addMarker(latitude: Double, longitude: Double, id: Int, title: String) {
-        val newMarker = MapMarker(id, latitude, longitude, title)
-        markersList.add(newMarker)
-        clearMarkers()
-        drawMarkersOnMap()
-    }
-
-    fun drawMarkersOnMap() {
-        markersList.forEach {
-            mapView?.apply {
-                val marker = Marker(mapView)
-                marker.position = GeoPoint(it.getLatitude(), it.getLongitude())
-                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                marker.title = "Marker"
-                marker.snippet = "Lat: ${it.getLatitude()}, Lng: ${it.getLongitude()}"
-                overlays.add(marker)
-            }
-        }
-    }
 }

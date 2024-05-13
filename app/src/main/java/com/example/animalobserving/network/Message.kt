@@ -17,7 +17,8 @@ enum class MsgType(val number: Int) {
     RequestAllMarkers(number = 2),
     RequestMarkers(number = 3),
     RequestDetailedMarker(number = 4),
-    MapMarkerInfo(number = 5)
+    MapMarkerInfo(number = 7),
+    RequestAllSpecies(number = 5)
 }
 
 data class Message(val Text: String, val Date: Date, val SenderName: String, val MessageType: MsgType = MsgType.Informative) {
