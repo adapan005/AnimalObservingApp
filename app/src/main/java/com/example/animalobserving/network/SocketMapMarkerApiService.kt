@@ -1,6 +1,6 @@
 package com.example.animalobserving.network
 
-import com.example.animalobserving.ui.screens.MapMarker
+import com.example.animalobserving.data.markers.MapMarker
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -20,7 +20,7 @@ class SocketMapMarkerApiServiceImpl() : SocketMapMarkerApiService {
         var navrat: MutableList<MapMarker> = mutableListOf()
 
         val socket = Socket("192.168.100.196", 55557)
-        socket.setSoTimeout(100)
+        socket.setSoTimeout(400)
         val writer = PrintWriter(socket.getOutputStream(), true)
         val reader = BufferedReader(InputStreamReader(socket.getInputStream()))
 

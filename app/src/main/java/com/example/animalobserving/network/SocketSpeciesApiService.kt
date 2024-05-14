@@ -14,9 +14,19 @@ import java.util.Calendar
 
 interface SocketSpeciesApiService {
     suspend fun getSpecies(): List<Specie>
+    suspend fun submitNewRecord(value: String)
 }
 
 class SocketSpeciesApiServiceImpl() : SocketSpeciesApiService {
+    override suspend fun submitNewRecord(value: String) {
+        val socket = Socket("192.168.100.196", 55557)
+        socket.setSoTimeout(100)
+        val writer = PrintWriter(socket.getOutputStream())
+        val newMessage = Message(value, Calendar.getInstance().time, "Android client", MsgType.AddRecordWithMarker)
+        writer.println(newMessage.toJsonString())
+        writer.close()
+        socket.close()
+    }
 
     override suspend fun getSpecies(): List<Specie> = withContext(Dispatchers.IO) {
         var navrat: MutableList<Specie> = mutableListOf()

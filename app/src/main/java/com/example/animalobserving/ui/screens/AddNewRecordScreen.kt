@@ -1,8 +1,11 @@
 package com.example.animalobserving.ui.screens
 
+import android.widget.Toast
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
@@ -14,12 +17,15 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -29,7 +35,9 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.animalobserving.AnimalObservingApplication
 import com.example.animalobserving.data.species.Specie
 import com.example.animalobserving.data.species.SpeciesRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 sealed interface SpeciesUiState {
     data class Success(val species: List<Specie>) : SpeciesUiState
@@ -42,6 +50,7 @@ class SpeciesViewModel(private val speciesRepository: SpeciesRepository) : ViewM
     val recordDescriptionText = mutableStateOf("")
     val recordLatitude = mutableStateOf(0.0)
     val recordLongitude = mutableStateOf(0.0)
+    val selectedSpecieID = mutableStateOf(0)
     var speciesUiState: SpeciesUiState by mutableStateOf(SpeciesUiState.Loading)
         private set
     init {
@@ -55,6 +64,26 @@ class SpeciesViewModel(private val speciesRepository: SpeciesRepository) : ViewM
                 SpeciesUiState.Success(speciesRepository.getSpecies())
             } catch (e: Exception) {
                 SpeciesUiState.Error
+            }
+        }
+    }
+
+    fun submitNewRecord() {
+        viewModelScope.launch {
+            try {
+                val latitudeWithComma = recordLatitude.value.toString().replace('.', ',')
+                val longitudeWithComma = recordLongitude.value.toString().replace('.', ',')
+                withContext(Dispatchers.IO) {
+                    speciesRepository.submitNewRecord(
+                        "" +
+                                "${selectedSpecieID.value};" +
+                                "${latitudeWithComma};" +
+                                "${longitudeWithComma};" +
+                                "${recordNameText.value};" +
+                                "${recordDescriptionText.value}")
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
@@ -76,6 +105,8 @@ fun AddingNewRecordScreen (
 ) {
     val speciesViewModel: SpeciesViewModel = viewModel(factory = SpeciesViewModel.Factory)
     val recordNameText by remember { speciesViewModel.recordNameText }
+    val selectedSpecie = remember { mutableStateOf("") }
+    val selectedSpecieID = remember { speciesViewModel.selectedSpecieID }
     val recordDescriptionText by remember { speciesViewModel.recordDescriptionText }
     val recordLatitude by remember { speciesViewModel.recordLatitude }
     val recordLongitude by remember { speciesViewModel.recordLongitude }
@@ -84,8 +115,9 @@ fun AddingNewRecordScreen (
     when (speciesViewModel.speciesUiState) {
         is SpeciesUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
         is SpeciesUiState.Success -> {
-
-            Column(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .padding(32.dp)) {
                 Text("Enter name of record:")
                 TextField(
                     value = recordNameText,
@@ -116,9 +148,15 @@ fun AddingNewRecordScreen (
                         speciesViewModel.recordLongitude.value = newText.toDouble()
                     }
                 )
+                Button(onClick = {
+                    TODO("NOT IMPLEMENTED YET;")
+                }) {
+                    Text(text = "Get current coordinates")
+                }
                 Text("Choose animal specie:")
-                DynamicSelectTextField("F", (speciesViewModel.speciesUiState as SpeciesUiState.Success).species, "Label", {}, modifier = Modifier.weight(1f))
-                Button(onClick = { /*TODO*/ }) {
+                //DropdownSelector((speciesViewModel.speciesUiState as SpeciesUiState.Success).species, "Label", {}, modifier = Modifier.weight(1f))
+                SpecieSelectionMenu((speciesViewModel.speciesUiState as SpeciesUiState.Success).species, "Select animal specie", selectedSpecie, selectedSpecieID, modifier.weight(1f))
+                Button(onClick = { speciesViewModel.submitNewRecord() }) {
                     Text(text = "Submit")
                 }
             }
@@ -129,44 +167,53 @@ fun AddingNewRecordScreen (
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DynamicSelectTextField(
-    selectedValue: String,
-    options: List<Specie>,
+fun SpecieSelectionMenu(
+    species: List<Specie>,
     label: String,
-    onValueChangedEvent: (String) -> Unit,
+    selectedTextState: MutableState<String>,
+    selectedSpecieIdState: MutableState<Int>,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
 
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded },
+    Box(
         modifier = modifier
     ) {
-        OutlinedTextField(
-            readOnly = true,
-            value = selectedValue,
-            onValueChange = {},
-            //label = { Text(text = label) },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-            },
-            colors = OutlinedTextFieldDefaults.colors(),
-            modifier = Modifier
-                .menuAnchor()
-                .fillMaxWidth()
-        )
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = {
+                expanded = !expanded
+            }
+        ) {
+            TextField(
+                value = selectedTextState.value,
+                onValueChange = { selectedTextState.value = it },
+                label = { Text(text = label) },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                modifier = Modifier.menuAnchor()
+            )
 
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            val speciesNames: List<String> = options.map { it.getSpecieName() }
-            speciesNames.forEach { option: String ->
-                DropdownMenuItem(
-                    text = { Text(text = option) },
-                    onClick = {
-                        expanded = false
-                        onValueChangedEvent(option)
+            val filteredOptions = species.filter { it.getSpecieName().contains(selectedTextState.value, ignoreCase = true) }
+            if (filteredOptions.isNotEmpty()) {
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = {
+
                     }
-                )
+                ) {
+                    filteredOptions.forEach { specie ->
+                        DropdownMenuItem(
+                            text = { Text(text = specie.getSpecieName()) },
+                            onClick = {
+                                selectedTextState.value = specie.getSpecieName()
+                                selectedSpecieIdState.value = specie.getID()
+                                expanded = false
+                                //Toast.makeText(context, "Selected ID: ${specie.getID()}", Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    }
+                }
             }
         }
     }

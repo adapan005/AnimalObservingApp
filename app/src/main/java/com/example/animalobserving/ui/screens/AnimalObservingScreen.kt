@@ -1,5 +1,8 @@
 package com.example.animalobserving.ui.screens
 
+import android.content.ContentValues.TAG
+import android.nfc.Tag
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -38,7 +41,8 @@ enum class AppScreen(@StringRes val title: Int) {
     List(title = R.string.list_screen),
     Filter(title = R.string.filter_screen),
     Settings(title = R.string.settings_screen),
-    NewRecord(title = R.string.new_record_screen)
+    NewRecord(title = R.string.new_record_screen),
+    RecordDetails(title = R.string.record_details_screen)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,11 +78,16 @@ fun AnimalObservingApp(
     navController: NavHostController = rememberNavController()
 ) {
     val mapViewModel: MapViewModel = viewModel(factory = MapViewModel.Factory)
-
+    var currentScreen: AppScreen = AppScreen.Home
     val backStackEntry by navController.currentBackStackEntryAsState()
-    var currentScreen = AppScreen.valueOf(
-        backStackEntry?.destination?.route ?: AppScreen.Home.name
-    )
+    val route = backStackEntry?.destination?.route?.split("/")?.get(0)
+    try {
+        route?.let {
+            currentScreen = AppScreen.valueOf(it)
+        }
+    } catch (e: Exception) {
+        Log.d(TAG, "RECEIVED: ${e.toString()}")
+    }
 
     Scaffold (
         topBar = {
@@ -112,7 +121,7 @@ fun AnimalObservingApp(
                         if (currentScreen != AppScreen.Home) {
                             navController.popBackStack(AppScreen.Home.name, inclusive = false)
                             currentScreen = AppScreen.valueOf(
-                                backStackEntry?.destination?.route ?: AppScreen.Home.name
+                                backStackEntry?.destination?.route?.split("/")?.get(0) ?: AppScreen.Home.name
                             )
                         }
                     }
@@ -125,7 +134,7 @@ fun AnimalObservingApp(
                         if (currentScreen != AppScreen.List) {
                             navController.navigate(AppScreen.List.name)
                             currentScreen = AppScreen.valueOf(
-                                backStackEntry?.destination?.route ?: AppScreen.List.name
+                                backStackEntry?.destination?.route?.split("/")?.get(0) ?: AppScreen.List.name
                             )
                         }
                     }
@@ -138,7 +147,7 @@ fun AnimalObservingApp(
                         if (currentScreen != AppScreen.Filter) {
                             navController.navigate(AppScreen.Filter.name)
                             currentScreen = AppScreen.valueOf(
-                                backStackEntry?.destination?.route ?: AppScreen.Filter.name
+                                backStackEntry?.destination?.route?.split("/")?.get(0) ?: AppScreen.Filter.name
                             )
                         }
                     }
@@ -151,7 +160,7 @@ fun AnimalObservingApp(
                         if (currentScreen != AppScreen.Settings) {
                             navController.navigate(AppScreen.Settings.name)
                             currentScreen = AppScreen.valueOf(
-                                backStackEntry?.destination?.route ?: AppScreen.Settings.name
+                                backStackEntry?.destination?.route?.split("/")?.get(0) ?: AppScreen.Settings.name
                             )
                         }
                     }
@@ -195,6 +204,13 @@ fun AnimalObservingApp(
             composable(route = AppScreen.NewRecord.name) {
                 AddingNewRecordScreen(
                     modifier = Modifier.fillMaxSize()
+                )
+            }
+            composable(route = AppScreen.RecordDetails.name + "/{recordID}") {
+                backStackEntry ->
+                RecordDetailsScreen(
+                        recordId = backStackEntry.arguments?.getString("recordID")?.toInt()?:-1,
+                        modifier = Modifier.fillMaxSize()
                 )
             }
         }

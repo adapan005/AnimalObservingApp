@@ -10,32 +10,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.animalobserving.AnimalObservingApplication
+import com.example.animalobserving.data.markers.MapMarker
 import com.example.animalobserving.data.markers.MapMarkersRepository
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 
-class MapMarker(private val markerId: Int, private val latitude: Double, private val longitude: Double, private val label: String) {
-    fun getLatitude(): Double {
-        return latitude
-    }
-
-    fun getLongitude(): Double {
-        return longitude
-    }
-
-    fun getLabel(): String {
-        return label
-    }
-
-    fun getID(): Int {
-        return markerId
-    }
-    override fun toString(): String {
-        return "$markerId;$latitude;$longitude"
-    }
-}
 
 sealed interface MapUiState {
     data class Success(val markers: List<MapMarker>) : MapUiState

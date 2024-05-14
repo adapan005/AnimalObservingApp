@@ -1,8 +1,5 @@
 package com.example.animalobserving.network
 
-import androidx.annotation.StringRes
-import com.example.animalobserving.R
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.JsonNull
@@ -15,10 +12,11 @@ import java.util.Date
 enum class MsgType(val number: Int) {
     Informative(number = 1),
     RequestAllMarkers(number = 2),
-    RequestMarkers(number = 3),
-    RequestDetailedMarker(number = 4),
+    //RequestMarkers(number = 3),
+    RequestDetailedRecord(number = 3),
     MapMarkerInfo(number = 7),
-    RequestAllSpecies(number = 5)
+    RequestAllSpecies(number = 5),
+    AddRecordWithMarker(number = 6)
 }
 
 data class Message(val Text: String, val Date: Date, val SenderName: String, val MessageType: MsgType = MsgType.Informative) {

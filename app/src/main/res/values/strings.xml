@@ -6,4 +6,8 @@
     <string name="settings_screen">Settings</string>
     <string name="back_button">Back</string>
     <string name="new_record_screen">Add a new record</string>
+    <string name="record_details_screen">Record Details</string>
+    <string name="recordDate">Date:</string>
+    <string name="recordSpecie">Specie:</string>
+    <string name="description">Description:</string>
 </resources>

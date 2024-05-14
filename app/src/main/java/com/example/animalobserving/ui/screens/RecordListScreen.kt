@@ -1,6 +1,7 @@
 package com.example.animalobserving.ui.screens
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.animalobserving.data.markers.MapMarker
 
 @Composable
 fun RecordListScreen (
@@ -71,9 +73,11 @@ fun RecordButton(
         shape = MaterialTheme.shapes.medium,
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp),
         onClick = {
-            navController.navigate("TEST")
+            navController.navigate("${AppScreen.RecordDetails.name}/${marker.getID()}")
         }
     ) {
-        Text(text = marker.getLabel())
+        Column {
+            Text(text = marker.getLabel())
+        }
     }
 }
