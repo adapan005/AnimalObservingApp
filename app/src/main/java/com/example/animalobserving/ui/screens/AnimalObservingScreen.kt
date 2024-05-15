@@ -101,7 +101,7 @@ fun AnimalObservingApp(
             currentScreen = AppScreen.valueOf(it)
         }
     } catch (e: Exception) {
-        Log.d(TAG, "RECEIVED: ${e.toString()}")
+        Log.d(TAG, "RECEIVED : ${e.toString()}")
     }
 
     Scaffold (
