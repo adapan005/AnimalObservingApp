@@ -27,8 +27,6 @@ sealed interface MapUiState {
 class MapViewModel(private val mapMarkersRepository: MapMarkersRepository) : ViewModel() {
     val currentCentreLat = mutableStateOf(48.6690)
     val currentCentreLon = mutableStateOf(19.6990)
-    //centreLat: BigDecimal = BigDecimal("48.6690"),
-    //centreLng: BigDecimal = BigDecimal("19.6990")
 
     var mapUiState: MapUiState by mutableStateOf(MapUiState.Loading)
         private set

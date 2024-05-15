@@ -32,11 +32,8 @@ fun HomeScreen(
     navController: NavHostController,
     retryAction: () -> Unit,
     modifier: Modifier = Modifier,
-    //centreLat: BigDecimal = BigDecimal("48.6690"),
-    //centreLng: BigDecimal = BigDecimal("19.6990"),
 ) {
     var mapUiState = mapViewModel.mapUiState
-    //val geoPoint by remember { mutableStateOf(GeoPoint(centreLat.toDouble(), centreLng.toDouble())) }
 
     when (mapUiState) {
         is MapUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
@@ -51,8 +48,6 @@ fun OsmMap(
     navController: NavHostController,
     mapViewModel: MapViewModel,
     modifier: Modifier = Modifier,
-    //centreLat: BigDecimal = BigDecimal("48.6690"),
-    //centreLng: BigDecimal = BigDecimal("19.6990")
 ) {
     val currentLat by remember {
         mapViewModel.currentCentreLat
@@ -60,7 +55,6 @@ fun OsmMap(
     var currentLon by remember {
         mapViewModel.currentCentreLon
     }
-    //val geoPoint by remember { mutableStateOf(GeoPoint(centreLat.toDouble(), centreLng.toDouble())) }
     mapViewModel.mapView = MapView(LocalContext.current)
 
     Column(modifier = modifier.fillMaxSize()) {
@@ -86,11 +80,9 @@ fun OsmMap(
                     newMarker.position = position
 
                     newMarker.setOnMarkerClickListener { marker, _ ->
-                        // Trigger the navigation event
-                        //mapViewModel.onMarkerClick(it.getID())
                         Log.d(TAG, "CLICKED: ${it.getLabel()}")
                         navController.navigate("${AppScreen.RecordDetails.name}/${it.getID()}")
-                        true // Return true to indicate the event was handled
+                        true
                     }
                     mapViewModel.mapView?.overlays?.add(newMarker)
                 }

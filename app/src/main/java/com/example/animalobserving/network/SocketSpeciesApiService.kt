@@ -49,7 +49,6 @@ class SocketSpeciesApiServiceImpl(private val serverIP: String) : SocketSpeciesA
             }
             if (response != null) {
                 val message = Gson().fromJson(response, Message::class.java)
-                //val text = message.Text
                 val values = message.Text.split(";").toTypedArray()
 
                 val id = values[0].toInt()
@@ -58,7 +57,6 @@ class SocketSpeciesApiServiceImpl(private val serverIP: String) : SocketSpeciesA
                 navrat.add(specie)
             }
         } while (response != null)
-        //Log.d(TAG, "RECEIVED: ${message.Text}")
 
         writer.close()
         reader.close()

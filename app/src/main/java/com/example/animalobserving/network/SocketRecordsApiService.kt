@@ -37,8 +37,6 @@ class SocketRecordsApiServiceImpl(private val serverIP: String) : SocketRecordsA
         if (response != null) {
             val message = Gson().fromJson(response, Message::class.java)
             val values = message.Text.split(";").toTypedArray()
-            // Zobrazovanie mapy zatial nie je hotove...
-            //val markerID
             val lat = values[1].replace(',', '.').toDouble()
             val lon = values[2].replace(',', '.').toDouble()
 

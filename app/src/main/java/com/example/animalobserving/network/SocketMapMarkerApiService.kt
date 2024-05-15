@@ -29,7 +29,6 @@ class SocketMapMarkerApiServiceImpl(private val serverIP: String) : SocketMapMar
         writer.println(newMessage.toJsonString())
 
         ///////////// Read response from server
-        //TODO("OPRAVIT ABY TO VEDELO SPRACOVAT VSETKY JSON STRINGY ZO SERVERU BEZ TOHO TRY CATCH BLOKU")
 
         var response: String? = null
         do {
@@ -40,7 +39,6 @@ class SocketMapMarkerApiServiceImpl(private val serverIP: String) : SocketMapMar
             }
             if (response != null) {
                 val message = Gson().fromJson(response, Message::class.java)
-                //val text = message.Text
                 val values = message.Text.split(";").toTypedArray()
 
                 val id = values[0].toInt()
@@ -51,7 +49,6 @@ class SocketMapMarkerApiServiceImpl(private val serverIP: String) : SocketMapMar
                 navrat.add(marker)
             }
         } while (response != null)
-        //Log.d(TAG, "RECEIVED: ${message.Text}")
 
         writer.close()
         reader.close()

@@ -129,7 +129,6 @@ fun AddingNewRecordScreen (
     val recordDescriptionText by remember { speciesViewModel.recordDescriptionText }
     val recordLatitude by remember { speciesViewModel.recordLatitude }
     val recordLongitude by remember { speciesViewModel.recordLongitude }
-    //val selectedSpecie by remember {}
 
     when (speciesViewModel.speciesUiState) {
         is SpeciesUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
@@ -153,7 +152,7 @@ fun AddingNewRecordScreen (
                     }
                 )
                 Spacer(modifier = Modifier.height(50.dp))
-                Text(text = "Choose location of record:")
+                Text(text = stringResource(R.string.choose_location_of_record))
                 Card {
                     AndroidView(
                         modifier = Modifier
@@ -187,10 +186,7 @@ fun AddingNewRecordScreen (
                                         false
                                     }
                                 }
-
-                                // Override performClick to ensure accessibility services are notified
                                 this.setOnClickListener {
-                                    // You can add any additional behavior for click here if needed
                                 }
                             }!!
                         },
@@ -201,11 +197,11 @@ fun AddingNewRecordScreen (
                     )
                 }
                 Spacer(modifier = Modifier.height(50.dp))
-                Text("Choose animal specie:")
+                Text(stringResource(R.string.choose_animal_specie))
                 
                 SpecieSelectionMenu(
                     species = (speciesViewModel.speciesUiState as SpeciesUiState.Success).species,
-                    label = "Select animal specie",
+                    label = stringResource(R.string.select_animal_specie),
                     selectedTextState = selectedSpecie,
                     selectedSpecieIdState = selectedSpecieID,
                     modifier = Modifier.fillMaxWidth()
@@ -214,7 +210,7 @@ fun AddingNewRecordScreen (
                     speciesViewModel.submitNewRecord()
                     Toast.makeText(context, "Submitted!", Toast.LENGTH_SHORT).show()
                 }) {
-                    Text(text = "Submit")
+                    Text(text = stringResource(R.string.submit))
                 }
             }
         }
@@ -266,7 +262,7 @@ fun SpecieSelectionMenu(
                                 selectedTextState.value = specie.getSpecieName()
                                 selectedSpecieIdState.value = specie.getID()
                                 expanded = false
-                                Toast.makeText(context, "Selected ID: ${specie.getID()}", Toast.LENGTH_SHORT).show()
+                                //Toast.makeText(context, "Selected ID: ${specie.getID()}", Toast.LENGTH_SHORT).show()
                             }
                         )
                     }
