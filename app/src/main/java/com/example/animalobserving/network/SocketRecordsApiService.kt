@@ -39,8 +39,8 @@ class SocketRecordsApiServiceImpl : SocketRecordsApiService {
             val values = message.Text.split(";").toTypedArray()
             // Zobrazovanie mapy zatial nie je hotove...
             //val markerID
-            //val lat
-            //val lon
+            val lat = values[1].replace(',', '.').toDouble()
+            val lon = values[2].replace(',', '.').toDouble()
 
             //markerID, lat, lon, long, recordLabel, speciesID, date, description
             val name = values[3]
@@ -49,7 +49,7 @@ class SocketRecordsApiServiceImpl : SocketRecordsApiService {
 
             val dateFormat = SimpleDateFormat("dd. M. yyyy H:mm:ss")
             val recordDate = dateFormat.parse(values[5])
-            navrat = DetailedRecord(-1, 0.0, 0.0, name, speciesName, description, recordDate)
+            navrat = DetailedRecord(-1, lat, lon, name, speciesName, description, recordDate)
         }
         writer.close()
         reader.close()

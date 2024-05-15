@@ -180,6 +180,7 @@ fun AnimalObservingApp(
             composable(route = AppScreen.Home.name) {
                 HomeScreen(
                     mapViewModel = mapViewModel,
+                    navController,
                     retryAction = mapViewModel::getMapMarkers,
                     modifier = Modifier.fillMaxSize()
                 )

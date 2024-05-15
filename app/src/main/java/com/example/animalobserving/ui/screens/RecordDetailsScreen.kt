@@ -1,9 +1,16 @@
 package com.example.animalobserving.ui.screens
 
+import android.content.ContentValues
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -11,10 +18,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -28,6 +37,10 @@ import com.example.animalobserving.data.records.DetailedRecord
 import com.example.animalobserving.data.records.RecordsRepository
 import com.example.animalobserving.data.species.Specie
 import kotlinx.coroutines.launch
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
 
 sealed interface RecordDetailsUiState {
     data class Success(val detailedRecord: DetailedRecord) : RecordDetailsUiState
@@ -89,21 +102,49 @@ fun DetailsOfRecord (
     detailedRecord: DetailedRecord,
     modifier: Modifier
 ) {
-    Card {
-        Column(
-            modifier.padding(20.dp)
-        ) {
-            Text(text = detailedRecord.getLabel(), fontSize = 30.sp)
-            Row {
-                Text(text = stringResource(R.string.recordDate), fontWeight = FontWeight.Bold)
-                Text(text = detailedRecord.getDate())
-            }
-            Row {
-                Text(text = stringResource(R.string.recordSpecie), fontWeight = FontWeight.Bold)
-                Text(text = detailedRecord.getSpecieName())
-            }
-            Text(text = stringResource(R.string.description), fontWeight = FontWeight.Bold)
-            Text(text = detailedRecord.getDescription())
+    val mapViewModel: MapViewModel = viewModel(factory = MapViewModel.Factory)
+    mapViewModel.mapView = MapView(LocalContext.current)
+
+    Column(
+        modifier
+            .padding(20.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
+        Text(text = detailedRecord.getLabel(), fontSize = 30.sp)
+        Row {
+            Text(text = stringResource(R.string.recordDate), fontWeight = FontWeight.Bold)
+            Text(text = detailedRecord.getDate())
         }
+        Row {
+            Text(text = stringResource(R.string.recordSpecie), fontWeight = FontWeight.Bold)
+            Text(text = detailedRecord.getSpecieName())
+        }
+        Spacer(modifier = Modifier.height(66.dp))
+        AndroidView(
+            modifier = Modifier.fillMaxWidth().height(400.dp).padding(50.dp),
+            factory = { _ ->
+                mapViewModel.mapView?.getMapCenter()
+                mapViewModel.mapView?.apply {
+                    setTileSource(TileSourceFactory.MAPNIK)
+                    setOnClickListener { }
+                    setMultiTouchControls(false)
+                    isClickable = false
+                    setBuiltInZoomControls(false)
+                    this.setOnTouchListener { _, _ -> true }
+                }!!
+            },
+            update = { view ->
+                val geoPoint = GeoPoint(detailedRecord.getLatitude(), detailedRecord.getLongitude())
+                view.controller.setCenter(geoPoint)
+                view.controller.setZoom(13)
+                val newMarker = Marker(mapViewModel.mapView)
+                val position = GeoPoint(detailedRecord.getLatitude(), detailedRecord.getLongitude())
+                newMarker.position = position
+                mapViewModel.mapView?.overlays?.add(newMarker)
+            }
+        )
+        Spacer(modifier = Modifier.height(50.dp))
+        Text(text = stringResource(R.string.description), fontWeight = FontWeight.Bold)
+        Text(text = detailedRecord.getDescription())
     }
 }

@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -97,6 +99,7 @@ class SpeciesViewModel(private val speciesRepository: SpeciesRepository) : ViewM
             }
         }
     }
+
 }
 
 @Composable
@@ -116,6 +119,7 @@ fun AddingNewRecordScreen (
         is SpeciesUiState.Loading -> LoadingScreen(modifier = modifier.fillMaxSize())
         is SpeciesUiState.Success -> {
             Column(modifier = Modifier
+                .verticalScroll(rememberScrollState())
                 .fillMaxWidth()
                 .padding(32.dp)) {
                 Text("Enter name of record:")
