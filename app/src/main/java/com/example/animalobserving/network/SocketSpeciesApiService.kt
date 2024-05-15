@@ -17,9 +17,9 @@ interface SocketSpeciesApiService {
     suspend fun submitNewRecord(value: String)
 }
 
-class SocketSpeciesApiServiceImpl() : SocketSpeciesApiService {
+class SocketSpeciesApiServiceImpl(private val serverIP: String) : SocketSpeciesApiService {
     override suspend fun submitNewRecord(value: String) {
-        val socket = Socket("192.168.100.196", 55557)
+        val socket = Socket(serverIP, 55557)
         socket.setSoTimeout(100)
         val writer = PrintWriter(socket.getOutputStream())
         val newMessage = Message(value, Calendar.getInstance().time, "Android client", MsgType.AddRecordWithMarker)
@@ -31,7 +31,7 @@ class SocketSpeciesApiServiceImpl() : SocketSpeciesApiService {
     override suspend fun getSpecies(): List<Specie> = withContext(Dispatchers.IO) {
         var navrat: MutableList<Specie> = mutableListOf()
 
-        val socket = Socket("192.168.100.196", 55557)
+        val socket = Socket(serverIP, 55557)
         socket.setSoTimeout(100)
         val writer = PrintWriter(socket.getOutputStream(), true)
         val reader = BufferedReader(InputStreamReader(socket.getInputStream()))

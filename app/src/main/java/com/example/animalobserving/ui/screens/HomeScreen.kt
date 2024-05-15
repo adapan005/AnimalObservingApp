@@ -10,7 +10,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -26,7 +25,6 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
-import java.math.BigDecimal
 
 @Composable
 fun HomeScreen(
@@ -71,6 +69,9 @@ fun OsmMap(
             factory = { _ ->
                 mapViewModel.mapView?.getMapCenter()
                 mapViewModel.mapView?.apply {
+
+                    setMultiTouchControls(true)
+                    setBuiltInZoomControls(false)
                     setTileSource(TileSourceFactory.MAPNIK)
                     setOnClickListener { }
                 }!!

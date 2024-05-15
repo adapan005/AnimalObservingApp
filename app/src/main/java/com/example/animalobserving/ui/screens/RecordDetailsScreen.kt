@@ -120,29 +120,35 @@ fun DetailsOfRecord (
             Text(text = detailedRecord.getSpecieName())
         }
         Spacer(modifier = Modifier.height(66.dp))
-        AndroidView(
-            modifier = Modifier.fillMaxWidth().height(400.dp).padding(50.dp),
-            factory = { _ ->
-                mapViewModel.mapView?.getMapCenter()
-                mapViewModel.mapView?.apply {
-                    setTileSource(TileSourceFactory.MAPNIK)
-                    setOnClickListener { }
-                    setMultiTouchControls(false)
-                    isClickable = false
-                    setBuiltInZoomControls(false)
-                    this.setOnTouchListener { _, _ -> true }
-                }!!
-            },
-            update = { view ->
-                val geoPoint = GeoPoint(detailedRecord.getLatitude(), detailedRecord.getLongitude())
-                view.controller.setCenter(geoPoint)
-                view.controller.setZoom(13)
-                val newMarker = Marker(mapViewModel.mapView)
-                val position = GeoPoint(detailedRecord.getLatitude(), detailedRecord.getLongitude())
-                newMarker.position = position
-                mapViewModel.mapView?.overlays?.add(newMarker)
-            }
-        )
+        Card {
+            AndroidView(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxSize()
+                    .height(400.dp)
+                    .padding(50.dp),
+                factory = { _ ->
+                    mapViewModel.mapView?.getMapCenter()
+                    mapViewModel.mapView?.apply {
+                        setTileSource(TileSourceFactory.MAPNIK)
+                        setMultiTouchControls(true)
+                        isClickable = true
+                        setOnClickListener { }
+                        setBuiltInZoomControls(false)
+                    }!!
+                },
+                update = { view ->
+                    val geoPoint = GeoPoint(detailedRecord.getLatitude(), detailedRecord.getLongitude())
+                    view.controller.setCenter(geoPoint)
+                    view.controller.setZoom(13)
+                    val newMarker = Marker(mapViewModel.mapView)
+                    val position = GeoPoint(detailedRecord.getLatitude(), detailedRecord.getLongitude())
+                    newMarker.position = position
+                    newMarker.title = detailedRecord.getLabel()
+                    mapViewModel.mapView?.overlays?.add(newMarker)
+                }
+            )
+        }
         Spacer(modifier = Modifier.height(50.dp))
         Text(text = stringResource(R.string.description), fontWeight = FontWeight.Bold)
         Text(text = detailedRecord.getDescription())

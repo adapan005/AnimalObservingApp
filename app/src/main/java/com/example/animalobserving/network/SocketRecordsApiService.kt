@@ -15,11 +15,11 @@ interface SocketRecordsApiService {
     suspend fun getDetailedRecord(recordId: Int): DetailedRecord
 }
 
-class SocketRecordsApiServiceImpl : SocketRecordsApiService {
+class SocketRecordsApiServiceImpl(private val serverIP: String) : SocketRecordsApiService {
     override suspend fun getDetailedRecord(recordId: Int): DetailedRecord = withContext(Dispatchers.IO) {
         var navrat: DetailedRecord = DetailedRecord(-1, 0.0, 0.0, "","","", Calendar.getInstance().time)
 
-        val socket = Socket("192.168.100.196", 55557)
+        val socket = Socket(serverIP, 55557)
         socket.setSoTimeout(100)
         val writer = PrintWriter(socket.getOutputStream(), true)
         val reader = BufferedReader(InputStreamReader(socket.getInputStream()))

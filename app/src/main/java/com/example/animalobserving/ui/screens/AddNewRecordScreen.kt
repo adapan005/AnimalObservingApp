@@ -15,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -38,6 +39,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.navigation.NavHostController
 import com.example.animalobserving.AnimalObservingApplication
 import com.example.animalobserving.R
 import com.example.animalobserving.data.species.Specie
@@ -113,8 +115,10 @@ class SpeciesViewModel(private val speciesRepository: SpeciesRepository) : ViewM
 
 @Composable
 fun AddingNewRecordScreen (
+    navController: NavHostController,
     modifier: Modifier
 ) {
+    val context = LocalContext.current
     val mapViewModel: MapViewModel = viewModel(factory = MapViewModel.Factory)
     mapViewModel.mapView = MapView(LocalContext.current)
 
@@ -149,66 +153,67 @@ fun AddingNewRecordScreen (
                     }
                 )
                 Spacer(modifier = Modifier.height(50.dp))
-                AndroidView(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(400.dp)
-                        .padding(50.dp),
-                    factory = { context ->
-                        mapViewModel.mapView?.apply {
-                            setTileSource(TileSourceFactory.MAPNIK)
-                            setMultiTouchControls(true)
-                            isClickable = true
-                            setBuiltInZoomControls(true)
+                Text(text = "Choose location of record:")
+                Card {
+                    AndroidView(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(400.dp)
+                            .padding(50.dp),
+                        factory = { context ->
+                            mapViewModel.mapView?.apply {
+                                setTileSource(TileSourceFactory.MAPNIK)
+                                setMultiTouchControls(true)
+                                isClickable = true
+                                setBuiltInZoomControls(false)
 
-                            // Set an onTouchListener to handle tap events
-                            setOnTouchListener { view, event ->
-                                if (event.action == MotionEvent.ACTION_UP) {
-                                    mapViewModel.mapView?.overlays?.clear()
-                                    // Convert touch coordinates to GeoPoint
-                                    val projection = this.projection
-                                    val geoPoint = projection.fromPixels(event.x.toInt(), event.y.toInt())
-
-                                    speciesViewModel.recordLatitude.value = geoPoint.latitude
-                                    speciesViewModel.recordLongitude.value = geoPoint.longitude
-                                    Log.d(TAG, "${speciesViewModel.recordLatitude.value}")
-                                    // Create a marker at the tapped location
-                                    val marker = Marker(this).apply {
-                                        position = geoPoint as GeoPoint?
-                                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                                setOnTouchListener { view, event ->
+                                    if (event.action == MotionEvent.ACTION_UP) {
+                                        mapViewModel.mapView?.overlays?.clear()
+                                        val projection = this.projection
+                                        val geoPoint = projection.fromPixels(event.x.toInt(), event.y.toInt())
+                                        speciesViewModel.recordLatitude.value = geoPoint.latitude
+                                        speciesViewModel.recordLongitude.value = geoPoint.longitude
+                                        Log.d(TAG, "${speciesViewModel.recordLatitude.value}")
+                                        val marker = Marker(this).apply {
+                                            position = geoPoint as GeoPoint?
+                                            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                                        }
+                                        this.overlays.add(marker)
+                                        this.invalidate()
+                                        view.performClick()
+                                        true
+                                    } else {
+                                        false
                                     }
-
-                                    // Add the marker to the map
-                                    this.overlays.add(marker)
-
-                                    // Invalidate the map to refresh it
-                                    this.invalidate()
-
-                                    // Call performClick to notify accessibility services
-                                    view.performClick()
-
-                                    true
-                                } else {
-                                    false
                                 }
-                            }
 
-                            // Override performClick to ensure accessibility services are notified
-                            this.setOnClickListener {
-                                // You can add any additional behavior for click here if needed
-                            }
-                        }!!
-                    },
-                    update = { view ->
-                        view.controller.setCenter(GeoPoint(48.6690, 19.6990))
-                        view.controller.setZoom(8)
-                    }
-                )
+                                // Override performClick to ensure accessibility services are notified
+                                this.setOnClickListener {
+                                    // You can add any additional behavior for click here if needed
+                                }
+                            }!!
+                        },
+                        update = { view ->
+                            view.controller.setCenter(GeoPoint(48.6690, 19.6990))
+                            view.controller.setZoom(8)
+                        }
+                    )
+                }
                 Spacer(modifier = Modifier.height(50.dp))
                 Text("Choose animal specie:")
-                //DropdownSelector((speciesViewModel.speciesUiState as SpeciesUiState.Success).species, "Label", {}, modifier = Modifier.weight(1f))
-                SpecieSelectionMenu((speciesViewModel.speciesUiState as SpeciesUiState.Success).species, "Select animal specie", selectedSpecie, selectedSpecieID, modifier.weight(1f))
-                Button(onClick = { speciesViewModel.submitNewRecord() }) {
+                
+                SpecieSelectionMenu(
+                    species = (speciesViewModel.speciesUiState as SpeciesUiState.Success).species,
+                    label = "Select animal specie",
+                    selectedTextState = selectedSpecie,
+                    selectedSpecieIdState = selectedSpecieID,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Button(onClick = {
+                    speciesViewModel.submitNewRecord()
+                    Toast.makeText(context, "Submitted!", Toast.LENGTH_SHORT).show()
+                }) {
                     Text(text = "Submit")
                 }
             }
@@ -261,7 +266,7 @@ fun SpecieSelectionMenu(
                                 selectedTextState.value = specie.getSpecieName()
                                 selectedSpecieIdState.value = specie.getID()
                                 expanded = false
-                                //Toast.makeText(context, "Selected ID: ${specie.getID()}", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Selected ID: ${specie.getID()}", Toast.LENGTH_SHORT).show()
                             }
                         )
                     }

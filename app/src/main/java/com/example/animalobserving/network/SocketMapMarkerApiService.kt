@@ -14,12 +14,12 @@ interface SocketMapMarkerApiService {
     suspend fun getMarkers(): List<MapMarker>
 }
 
-class SocketMapMarkerApiServiceImpl() : SocketMapMarkerApiService {
+class SocketMapMarkerApiServiceImpl(private val serverIP: String) : SocketMapMarkerApiService {
 
     override suspend fun getMarkers(): List<MapMarker> = withContext(Dispatchers.IO) {
         var navrat: MutableList<MapMarker> = mutableListOf()
 
-        val socket = Socket("192.168.100.196", 55557)
+        val socket = Socket(serverIP, 55557)
         socket.setSoTimeout(400)
         val writer = PrintWriter(socket.getOutputStream(), true)
         val reader = BufferedReader(InputStreamReader(socket.getInputStream()))

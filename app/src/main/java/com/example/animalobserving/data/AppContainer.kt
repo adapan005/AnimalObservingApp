@@ -20,17 +20,18 @@ interface AppContainer {
 }
 
 class DefaultAppContainer : AppContainer {
+    private val SERVER_IP: String = "192.168.100.196"
 
     private val socketMapMarkerApiService: SocketMapMarkerApiService by lazy {
-        SocketMapMarkerApiServiceImpl()
+        SocketMapMarkerApiServiceImpl(SERVER_IP)
     }
 
     private val socketSpeciesApiService: SocketSpeciesApiService by lazy {
-        SocketSpeciesApiServiceImpl()
+        SocketSpeciesApiServiceImpl(SERVER_IP)
     }
 
     private val socketRecordsApiService: SocketRecordsApiService by lazy {
-        SocketRecordsApiServiceImpl()
+        SocketRecordsApiServiceImpl(SERVER_IP)
     }
 
     override val mapMarkersRepository: MapMarkersRepository by lazy {
