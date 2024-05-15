@@ -16,9 +16,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
+import com.example.animalobserving.R
 import com.example.animalobserving.data.markers.MapMarker
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -81,8 +83,6 @@ fun OsmMap(
                     val newMarker = Marker(mapViewModel.mapView)
                     val position = GeoPoint(it.getLatitude(), it.getLongitude())
                     newMarker.position = position
-                    newMarker.title = it.getLabel()
-                    newMarker.subDescription = "Record ID: ${it.getID()}"
 
                     newMarker.setOnMarkerClickListener { marker, _ ->
                         // Trigger the navigation event
@@ -100,7 +100,7 @@ fun OsmMap(
 
 @Composable
 fun LoadingScreen(modifier: Modifier = Modifier) {
-    Text(text = "Loading")
+    Text(text = stringResource(R.string.loading))
 }
 
 @Composable
@@ -110,9 +110,9 @@ fun ErrorScreen(retryAction: () -> Unit, modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Error", modifier = Modifier.padding(16.dp))
+        Text(text = stringResource(R.string.error), modifier = Modifier.padding(16.dp))
         Button(onClick = retryAction) {
-            Text("Retry")
+            Text(stringResource(R.string.retry))
         }
     }
 }

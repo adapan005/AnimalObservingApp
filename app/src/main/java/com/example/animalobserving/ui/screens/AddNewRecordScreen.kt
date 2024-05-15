@@ -1,10 +1,15 @@
 package com.example.animalobserving.ui.screens
 
+import android.content.ContentValues.TAG
+import android.util.Log
+import android.view.MotionEvent
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -14,8 +19,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -26,8 +29,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -35,11 +39,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.animalobserving.AnimalObservingApplication
+import com.example.animalobserving.R
 import com.example.animalobserving.data.species.Specie
 import com.example.animalobserving.data.species.SpeciesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
 
 sealed interface SpeciesUiState {
     data class Success(val species: List<Specie>) : SpeciesUiState
@@ -106,6 +115,9 @@ class SpeciesViewModel(private val speciesRepository: SpeciesRepository) : ViewM
 fun AddingNewRecordScreen (
     modifier: Modifier
 ) {
+    val mapViewModel: MapViewModel = viewModel(factory = MapViewModel.Factory)
+    mapViewModel.mapView = MapView(LocalContext.current)
+
     val speciesViewModel: SpeciesViewModel = viewModel(factory = SpeciesViewModel.Factory)
     val recordNameText by remember { speciesViewModel.recordNameText }
     val selectedSpecie = remember { mutableStateOf("") }
@@ -122,41 +134,77 @@ fun AddingNewRecordScreen (
                 .verticalScroll(rememberScrollState())
                 .fillMaxWidth()
                 .padding(32.dp)) {
-                Text("Enter name of record:")
+                Text(stringResource(R.string.enter_name_of_record))
                 TextField(
                     value = recordNameText,
                     onValueChange = { newText ->
                         speciesViewModel.recordNameText.value = newText
                     }
                 )
-                Text("Enter description of record:")
+                Text(stringResource(R.string.enter_description_of_record))
                 TextField(
                     value = recordDescriptionText,
                     onValueChange = { newText ->
                         speciesViewModel.recordDescriptionText.value = newText
                     }
                 )
-                Text("Enter latitude:")
-                TextField(
-                    value = recordLatitude.toString(),
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                    onValueChange = { newText ->
-                        speciesViewModel.recordLatitude.value = newText.toDouble()
+                Spacer(modifier = Modifier.height(50.dp))
+                AndroidView(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(400.dp)
+                        .padding(50.dp),
+                    factory = { context ->
+                        mapViewModel.mapView?.apply {
+                            setTileSource(TileSourceFactory.MAPNIK)
+                            setMultiTouchControls(true)
+                            isClickable = true
+                            setBuiltInZoomControls(true)
+
+                            // Set an onTouchListener to handle tap events
+                            setOnTouchListener { view, event ->
+                                if (event.action == MotionEvent.ACTION_UP) {
+                                    mapViewModel.mapView?.overlays?.clear()
+                                    // Convert touch coordinates to GeoPoint
+                                    val projection = this.projection
+                                    val geoPoint = projection.fromPixels(event.x.toInt(), event.y.toInt())
+
+                                    speciesViewModel.recordLatitude.value = geoPoint.latitude
+                                    speciesViewModel.recordLongitude.value = geoPoint.longitude
+                                    Log.d(TAG, "${speciesViewModel.recordLatitude.value}")
+                                    // Create a marker at the tapped location
+                                    val marker = Marker(this).apply {
+                                        position = geoPoint as GeoPoint?
+                                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                                    }
+
+                                    // Add the marker to the map
+                                    this.overlays.add(marker)
+
+                                    // Invalidate the map to refresh it
+                                    this.invalidate()
+
+                                    // Call performClick to notify accessibility services
+                                    view.performClick()
+
+                                    true
+                                } else {
+                                    false
+                                }
+                            }
+
+                            // Override performClick to ensure accessibility services are notified
+                            this.setOnClickListener {
+                                // You can add any additional behavior for click here if needed
+                            }
+                        }!!
+                    },
+                    update = { view ->
+                        view.controller.setCenter(GeoPoint(48.6690, 19.6990))
+                        view.controller.setZoom(8)
                     }
                 )
-                Text("Enter longitude:")
-                TextField(
-                    value = recordLongitude.toString(),
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                    onValueChange = { newText ->
-                        speciesViewModel.recordLongitude.value = newText.toDouble()
-                    }
-                )
-                Button(onClick = {
-                    TODO("NOT IMPLEMENTED YET;")
-                }) {
-                    Text(text = "Get current coordinates")
-                }
+                Spacer(modifier = Modifier.height(50.dp))
                 Text("Choose animal specie:")
                 //DropdownSelector((speciesViewModel.speciesUiState as SpeciesUiState.Success).species, "Label", {}, modifier = Modifier.weight(1f))
                 SpecieSelectionMenu((speciesViewModel.speciesUiState as SpeciesUiState.Success).species, "Select animal specie", selectedSpecie, selectedSpecieID, modifier.weight(1f))

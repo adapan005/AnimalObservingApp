@@ -106,7 +106,7 @@ fun AnimalObservingApp(
                         )
                     }
                 }) {
-                    Icon(Icons.Default.Add, contentDescription = "Add")
+                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add))
                 }
             }
         },
@@ -115,7 +115,7 @@ fun AnimalObservingApp(
                 val selectedItem = null
                 NavigationBarItem(
                     icon = { Icon(Icons.Filled.Home, contentDescription = "A") },
-                    label = { Text("Home") },
+                    label = { Text(stringResource(R.string.home)) },
                     selected = selectedItem == "B",
                     onClick = {
                         if (currentScreen != AppScreen.Home) {
@@ -128,7 +128,7 @@ fun AnimalObservingApp(
                 )
                 NavigationBarItem(
                     icon = { Icon(Icons.Filled.List, contentDescription = "A") },
-                    label = { Text("List") },
+                    label = { Text(stringResource(R.string.list)) },
                     selected = selectedItem == "A",
                     onClick = {
                         if (currentScreen != AppScreen.List) {
@@ -141,7 +141,7 @@ fun AnimalObservingApp(
                 )
                 NavigationBarItem(
                     icon = { Icon(Icons.Filled.Build, contentDescription = "A") },
-                    label = { Text("Filter") },
+                    label = { Text(stringResource(R.string.filter)) },
                     selected = selectedItem == "B",
                     onClick = {
                         if (currentScreen != AppScreen.Filter) {
@@ -154,7 +154,7 @@ fun AnimalObservingApp(
                 )
                 NavigationBarItem(
                     icon = { Icon(Icons.Filled.Settings, contentDescription = "A") },
-                    label = { Text("Settings") },
+                    label = { Text(stringResource(R.string.settings)) },
                     selected = selectedItem == "C",
                     onClick = {
                         if (currentScreen != AppScreen.Settings) {
